@@ -1,5 +1,10 @@
+using Mango.Services.Identity.Database;
+using Mango.Services.Identity.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,9 +16,40 @@ namespace Mango.Services.Identity
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            try
+            {
+                var host = CreateHostBuilder(args).Build();
+                using (var scope = host.Services.CreateScope())
+                {
+                    var services = scope.ServiceProvider;
+                    try
+                    {
+                        var context = services.GetRequiredService<DatabaseContext>();
+                        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                        if (context.Database.IsSqlServer())
+                        {
+                            await context.Database.MigrateAsync();
+                        }
+                         DatabaseContextSeed.SeedDataAsync(context,userManager,roleManager);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Exception: {ex}");
+                    }
+                }
+                await host.RunAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Host terminated unexpectedly {ex}");
+            }
+            finally
+            {
+                Console.WriteLine($"finally");
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
