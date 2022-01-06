@@ -1,8 +1,10 @@
 ﻿using Mango.Web.Models;
+using Mango.Web.Services.IServices;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,15 +16,12 @@ namespace Mango.Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IProductService _productService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IProductService productService)
         {
             _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
+            _productService = productService;
         }
 
         public IActionResult Privacy()
@@ -41,6 +40,29 @@ namespace Mango.Web.Controllers
         {
             
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            List<ProductDto> list = new();
+            var response = await _productService.GetAllProductsAsync<ResponseDto>(null);
+            if (response != null && response.IsSuccess)
+            {
+                list = JsonConvert.DeserializeObject<List<ProductDto>>(Convert.ToString(response.Result));
+            }
+            return View(list);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Details(int productId)
+        {
+            ProductDto model = new();
+            var response = await _productService.GetProductByIdAsync<ResponseDto>(productId, null);
+            if (response != null && response.IsSuccess)
+            {
+                model = JsonConvert.DeserializeObject<ProductDto>(Convert.ToString(response.Result));
+            }
+            return View(model);
         }
 
         public IActionResult Logout()
