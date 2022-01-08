@@ -1,8 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Mango.Services.ShoppingCartAPI.Database.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Mango.Services.ShoppingCartAPI.Database
 {
@@ -11,5 +8,9 @@ namespace Mango.Services.ShoppingCartAPI.Database
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
         }
+
+        public DbSet<Product> Products { get; set; }
+        public DbSet<CartHeader> CartHeaders { get; set; }
+        public DbSet<CartDetails> CartDetails { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using Mango.Services.ShoppingCartAPI.Database;
+using Mango.Services.ShoppingCartAPI.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -35,6 +36,8 @@ namespace Mango.Services.ShoppingCartAPI
             var mapper = MappingConfig.RegisterMaps().CreateMapper();
             services.AddSingleton(mapper);
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            services.AddScoped<ICartRepository, CartRepository>();
             services.AddControllers();
 
             services.AddAuthentication("Bearer")
