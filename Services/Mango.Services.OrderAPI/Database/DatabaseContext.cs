@@ -8,7 +8,7 @@ namespace Mango.Services.OrderAPI.Database
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
         }
-        public DbSet<OrderHeader> OrderHeader { get; set; }
+        public DbSet<OrderHeader> OrderHeaders { get; set; }
         public DbSet<OrderDetails> OrderDetails { get; set; }
     }
 }
