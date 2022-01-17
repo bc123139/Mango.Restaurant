@@ -41,6 +41,8 @@ namespace Mango.Services.OrderAPI.Messaging
             orderUpdatePaymentResultTopic = _configuration.GetValue<string>("OrderUpdatePaymentResultTopic");
             var client = new ServiceBusClient(serviceBusConnectionString);
             checkOutProcessor = client.CreateProcessor(checkoutMessageTopic, subscriptionCheckOut);
+            //Read message from the Queue
+            //checkOutProcessor = client.CreateProcessor("checkoutqueue");
             orderUpdatePaymentStatusProcessor = client.CreateProcessor(orderUpdatePaymentResultTopic, subscriptionUpdatePayment);
         }
 
