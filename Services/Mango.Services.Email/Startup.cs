@@ -1,7 +1,12 @@
+using Mango.Services.Email.Database;
+using Mango.Services.Email.Extensions;
+using Mango.Services.Email.Messaging;
+using Mango.Services.Email.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +31,17 @@ namespace Mango.Services.Email
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<DatabaseContext>(options =>
+              options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+
+            //IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
+            //services.AddSingleton(mapper);
+            services.AddScoped<IEmailRepository, EmailRepository>();
+            var optionBuilder = new DbContextOptionsBuilder<DatabaseContext>();
+            optionBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            services.AddSingleton(new EmailRepository(optionBuilder.Options));
+            services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -54,6 +70,7 @@ namespace Mango.Services.Email
             {
                 endpoints.MapControllers();
             });
+            app.UseAzureServiceBusConsumer();
         }
     }
 }
