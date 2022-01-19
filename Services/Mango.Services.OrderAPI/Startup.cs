@@ -44,6 +44,7 @@ namespace Mango.Services.OrderAPI
             services.AddSingleton(new OrderRepository(optionBuilder.Options));
             services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
             services.AddSingleton<IMessageBus, AzureServiceBusMessageBus>();
+            services.AddHostedService<RabbitMQCheckoutConsumer>();
             services.AddControllers();
 
             services.AddAuthentication("Bearer")
