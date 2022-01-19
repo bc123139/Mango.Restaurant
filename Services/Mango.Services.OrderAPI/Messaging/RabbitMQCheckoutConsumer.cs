@@ -1,4 +1,5 @@
 ﻿using Mango.Services.OrderAPI.Messages;
+using Mango.Services.OrderAPI.RabbitMQSender;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -16,9 +17,11 @@ namespace Mango.Services.OrderAPI.Messaging
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
+        private readonly IRabbitMQOrderMessageSender _rabbitMQOrderMessageSender;
 
-        public RabbitMQCheckoutConsumer()
+        public RabbitMQCheckoutConsumer(IRabbitMQOrderMessageSender rabbitMQOrderMessageSender)
         {
+            _rabbitMQOrderMessageSender = rabbitMQOrderMessageSender;
             var factory = new ConnectionFactory
             {
                 HostName = "localhost",
@@ -50,9 +53,20 @@ namespace Mango.Services.OrderAPI.Messaging
             return Task.CompletedTask;
         }
 
-        private void HandleMessage(CheckoutHeaderDto checkoutHeaderDto)
+        private  void HandleMessage(CheckoutHeaderDto checkoutHeaderDto)
         {
             Console.WriteLine(checkoutHeaderDto.FirstName);
+            PaymentRequestMessage paymentRequestMessage = new()
+            {
+                Name = checkoutHeaderDto.FirstName + " " + checkoutHeaderDto.LastName,
+                CardNumber = checkoutHeaderDto.CardNumber,
+                CVV = checkoutHeaderDto.CVV,
+                ExpiryMonthYear = checkoutHeaderDto.ExpiryMonthYear,
+                OrderId = checkoutHeaderDto.Id,
+                OrderTotal = checkoutHeaderDto.OrderTotal,
+                Email = checkoutHeaderDto.Email
+            };
+            _rabbitMQOrderMessageSender.SendMessage(paymentRequestMessage, "orderpaymentprocessqueue");
             return;
         }
     }
