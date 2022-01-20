@@ -1,4 +1,5 @@
 ﻿using Mango.Services.PaymentAPI.Messages;
+using Mango.Services.PaymentAPI.RabbitMQSender;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -16,9 +17,11 @@ namespace Mango.Services.PaymentAPI.Messaging
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
+        private readonly IRabbitMQPaymentMessageSender _rabbitMQPaymentMessageSender;
 
-        public RabbitMQPaymentConsumer()
+        public RabbitMQPaymentConsumer(IRabbitMQPaymentMessageSender rabbitMQPaymentMessageSender)
         {
+            _rabbitMQPaymentMessageSender = rabbitMQPaymentMessageSender;
             var factory = new ConnectionFactory
             {
                 HostName = "localhost",
@@ -58,6 +61,7 @@ namespace Mango.Services.PaymentAPI.Messaging
                 OrderId = paymentRequestMessage.OrderId,
                 Email = paymentRequestMessage.Email
             };
+            _rabbitMQPaymentMessageSender.SendMessage(paymentRequestMessage);
             return;
         }
     }
