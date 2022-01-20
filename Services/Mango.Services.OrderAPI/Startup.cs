@@ -2,6 +2,7 @@ using Mango.MessageBus;
 using Mango.Services.OrderAPI.Database;
 using Mango.Services.OrderAPI.Extensions;
 using Mango.Services.OrderAPI.Messaging;
+using Mango.Services.OrderAPI.RabbitMQSender;
 using Mango.Services.OrderAPI.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -44,6 +45,7 @@ namespace Mango.Services.OrderAPI
             services.AddSingleton(new OrderRepository(optionBuilder.Options));
             services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
             services.AddSingleton<IMessageBus, AzureServiceBusMessageBus>();
+            services.AddSingleton<IRabbitMQOrderMessageSender, RabbitMQOrderMessageSender>();
             services.AddHostedService<RabbitMQCheckoutConsumer>();
             services.AddControllers();
 
@@ -70,7 +72,7 @@ namespace Mango.Services.OrderAPI
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mango.Services.CouponAPI", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mango.Services.OrderAPI", Version = "v1" });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = @"Enter 'Bearer' [space] and your token",

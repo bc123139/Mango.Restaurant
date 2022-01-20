@@ -33,6 +33,7 @@ namespace Mango.Services.PaymentAPI
             services.AddSingleton<IProcessPayment, ProcessPayment>();
             services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
             services.AddSingleton<IMessageBus, AzureServiceBusMessageBus>();
+            services.AddHostedService<RabbitMQPaymentConsumer>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
