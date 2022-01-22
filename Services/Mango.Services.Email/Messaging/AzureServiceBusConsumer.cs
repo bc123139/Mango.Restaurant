@@ -14,7 +14,6 @@ namespace Mango.Services.Email.Messaging
         private readonly EmailRepository _emailRepository;
         private readonly string serviceBusConnectionString;
         private readonly string subscriptionEmail;
-        private readonly string orderPaymentProcessTopic;
         private readonly string orderUpdatePaymentResultTopic;
         private ServiceBusProcessor orderUpdatePaymentStatusProcessor;
 

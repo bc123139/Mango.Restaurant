@@ -42,7 +42,7 @@ namespace Mango.Services.Email
             optionBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             services.AddSingleton(new EmailRepository(optionBuilder.Options));
             services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
-
+            services.AddHostedService<RabbitMQPaymentConsumer>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
